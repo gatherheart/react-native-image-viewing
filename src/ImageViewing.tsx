@@ -15,6 +15,7 @@ import {
   VirtualizedList,
   ModalProps,
   Modal,
+  PixelRatio,
 } from "react-native";
 
 import ImageItem from "./components/ImageItem/ImageItem";
@@ -48,6 +49,8 @@ const DEFAULT_BG_COLOR = "#000";
 const DEFAULT_DELAY_LONG_PRESS = 800;
 const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
+const YOUR_INSET_LEFT = 10;
+const YOUR_INSET_RIGHT = 10;
 
 function ImageViewing({
   images,
@@ -83,6 +86,7 @@ function ImageViewing({
   const onZoom = useCallback(
     (isScaled: boolean) => {
       // @ts-ignore
+      console.log(PixelRatio.getPixelSizeForLayoutSize(10));
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
@@ -92,6 +96,7 @@ function ImageViewing({
   if (!visible) {
     return null;
   }
+
   return (
     <Modal
       transparent={presentationStyle === "overFullScreen"}
@@ -117,23 +122,30 @@ function ImageViewing({
           ref={imageList}
           data={images}
           horizontal
-          pagingEnabled
           windowSize={2}
           initialNumToRender={1}
           maxToRenderPerBatch={1}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          initialScrollIndex={imageIndex}
+          automaticallyAdjustInsets={false}
           getItem={(_, index) => images[index]}
           getItemCount={() => images.length}
+          initialScrollIndex={imageIndex}
+          decelerationRate={0}
+          snapToInterval={
+            SCREEN_WIDTH + PixelRatio.getPixelSizeForLayoutSize(10)
+          }
+          snapToAlignment={"start"}
           getItemLayout={(_, index) => {
-            console.log(SCREEN_WIDTH + 10, SCREEN_WIDTH * index + 10, index);
             return {
-              length: SCREEN_WIDTH + 20,
-              offset: SCREEN_WIDTH * index + 20,
+              length: SCREEN_WIDTH + PixelRatio.getPixelSizeForLayoutSize(10),
+              offset:
+                (SCREEN_WIDTH + PixelRatio.getPixelSizeForLayoutSize(10)) *
+                index,
               index,
             };
           }}
+          pagingEnabled
           renderItem={({ item: imageSrc, index }) => (
             <>
               <ImageItem
@@ -145,9 +157,11 @@ function ImageViewing({
                 swipeToCloseEnabled={swipeToCloseEnabled}
                 doubleTapToZoomEnabled={doubleTapToZoomEnabled}
               />
-              {index !== images.length - 1 ? (
-                <View style={{ width: 10, backgroundColor: "white" }}></View>
-              ) : null}
+              <View
+                style={{
+                  width: PixelRatio.getPixelSizeForLayoutSize(10),
+                }}
+              ></View>
             </>
           )}
           onMomentumScrollEnd={onScroll}
