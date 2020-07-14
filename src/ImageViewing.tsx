@@ -86,13 +86,12 @@ function ImageViewing({
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
-    [imageList],
+    [imageList]
   );
 
   if (!visible) {
     return null;
   }
-
   return (
     <Modal
       transparent={presentationStyle === "overFullScreen"}
@@ -106,15 +105,13 @@ function ImageViewing({
       <StatusBarManager presentationStyle={presentationStyle} />
       <View style={[styles.container, { opacity, backgroundColor }]}>
         <Animated.View style={[styles.header, { transform: headerTransform }]}>
-          {typeof HeaderComponent !== "undefined"
-            ? (
-              React.createElement(HeaderComponent, {
-                imageIndex: currentImageIndex,
-              })
-            )
-            : (
-              <ImageDefaultHeader onRequestClose={onRequestCloseEnhanced} />
-            )}
+          {typeof HeaderComponent !== "undefined" ? (
+            React.createElement(HeaderComponent, {
+              imageIndex: currentImageIndex,
+            })
+          ) : (
+            <ImageDefaultHeader onRequestClose={onRequestCloseEnhanced} />
+          )}
         </Animated.View>
         <VirtualizedList
           ref={imageList}
@@ -129,21 +126,29 @@ function ImageViewing({
           initialScrollIndex={imageIndex}
           getItem={(_, index) => images[index]}
           getItemCount={() => images.length}
-          getItemLayout={(_, index) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
-            index,
-          })}
-          renderItem={({ item: imageSrc }) => (
-            <ImageItem
-              onZoom={onZoom}
-              imageSrc={imageSrc}
-              onRequestClose={onRequestCloseEnhanced}
-              onLongPress={onLongPress}
-              delayLongPress={delayLongPress}
-              swipeToCloseEnabled={swipeToCloseEnabled}
-              doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-            />
+          getItemLayout={(_, index) => {
+            console.log(SCREEN_WIDTH + 10, SCREEN_WIDTH * index + 10, index);
+            return {
+              length: SCREEN_WIDTH + 20,
+              offset: SCREEN_WIDTH * index + 20,
+              index,
+            };
+          }}
+          renderItem={({ item: imageSrc, index }) => (
+            <>
+              <ImageItem
+                onZoom={onZoom}
+                imageSrc={imageSrc}
+                onRequestClose={onRequestCloseEnhanced}
+                onLongPress={onLongPress}
+                delayLongPress={delayLongPress}
+                swipeToCloseEnabled={swipeToCloseEnabled}
+                doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+              />
+              {index !== images.length - 1 ? (
+                <View style={{ width: 10, backgroundColor: "white" }}></View>
+              ) : null}
+            </>
           )}
           onMomentumScrollEnd={onScroll}
           //@ts-ignore
